@@ -12,4 +12,4 @@ class Candlestick(models.Model):
 	weighted_price = models.FloatField()
 
 	def __repr__(self):
-		return f'<Candlestick {self.timestamp}>'
+		return f'<Candlestick {self.datetime}>'
