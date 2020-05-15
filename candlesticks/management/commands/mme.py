@@ -11,10 +11,14 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		self._get_queryset(options['start_date'], options['stop_date'])
 		self._calculate(options['period'])
+		self._print_values()
 
 	def _get_queryset(self, start, stop):
-		self.qs = Candlestick.objects.filter(datetime__lte=stop, datetime__gte=start)
-		self.qs = self.qs.order_by('-datetime__date', '-datetime').distinct('datetime__date')
+		self.qs = Candlestick.end_of_the_day.filter(datetime__lte=stop, datetime__gte=start)
 
 	def _calculate(self, period):
-		return self.qs.media_movel_exponencial(period)
+		self.result = Candlestick.media_movel_exponencial(period, self.qs)
+
+	def _print_values(self):
+		for datetime, mme in self.result.items():
+			print(datetime, mme, sep=',')
