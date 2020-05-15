@@ -11,7 +11,7 @@ class Command(BaseCommand):
 	'''
 	Comando a ser usado para importar a planilha fornecida pelo kaggle para 
 	o banco de dados. Uso:
-	$ python manage.py populate caminho/para/planila.csv
+	$ python manage.py populate caminho/para/planilha.csv
 	'''
 
 	def add_arguments(self, parser):
