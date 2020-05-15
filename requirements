@@ -1,3 +1,4 @@
 pandas
 django>=3
 factory_boy
+psycopg2
