@@ -100,7 +100,7 @@ class Command(BaseCommand):
 		self.stdout.write('Criando objetos...')
 		batch = self.df.apply(self._build_model, axis=1).tolist()
 		self.stdout.write('Salvando no banco...')
-		Candlestick.objects.bulk_create(batch)
+		Candlestick.objects.bulk_create(batch, batch_size=100_000)
 		self.stdout.write(f'Sucesso!')
 
 	def _build_model(self, row):
