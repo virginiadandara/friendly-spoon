@@ -14,7 +14,7 @@ class Command(BaseCommand):
 		self._print_values()
 
 	def _get_queryset(self, start, stop):
-		self.qs = Candlestick.end_of_the_day.filter(datetime__lte=stop, datetime__gte=start)
+		self.qs = Candlestick.end_of_the_day.filter(datetime__lt=stop, datetime__gte=start)
 
 	def _calculate(self, period):
 		self.result = Candlestick.media_movel_exponencial(period, self.qs)
