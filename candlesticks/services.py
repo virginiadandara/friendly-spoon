@@ -29,7 +29,7 @@ class MediaMovelExponencial:
 		'''
 
 		self.period = period
-		self.start = pd.to_datetime(start)
+		self.start = pd.to_datetime(start) - timedelta(days=self.period)
 		self.stop = pd.to_datetime(stop)
 
 	def execute(self):
