@@ -3,7 +3,8 @@ from django.db import models
 # Create your models here.
 class ClandlestickEndOfTheDayManager(models.Manager):
 	'''
-	Manager que retorna a última instância de candlestick de cada dia
+	Manager que retorna a última instância de candlestick de cada dia, útil para o cálculo
+	de índices como a MME, por exemplo.
 	'''
 
 	def get_queryset(self):
@@ -20,7 +21,7 @@ class Candlestick(models.Model):
 	weighted_price = models.FloatField()
 
 	objects = models.Manager()
-	end_of_the_day = ClandlestickEndOfTheDayManager()
+	end_of_the_day = ClandlestickEndOfTheDayManager()	# filtro: último candlestick de cada dia
 
 	def __repr__(self):
 		return f'<Candlestick {self.datetime}>'
