@@ -3,19 +3,23 @@ from datetime import datetime, timedelta
 from django.test import TestCase
 
 from .models import Candlestick
+from .services import MediaMovelExponencial
 from .factories import CandlestickFactory
 
 # Create your tests here.
 class CandlestickTests(TestCase):
-	def test_media_movel_exponencial_20(self):
+	def create_candlesticks(self, n):
 		candlesticks = []
 		stop = datetime.now()
-		start = stop - timedelta(days=100)
+		start = stop - timedelta(days=n)
 		candlesticks.append(CandlestickFactory.build(datetime=stop))
-		for i in range(1, 100):
+		for i in range(1, n):
 			cs = CandlestickFactory.build(datetime=start + timedelta(days=i))
 			candlesticks.append(cs)
 		Candlestick.objects.bulk_create(candlesticks)
-		qs = Candlestick.end_of_the_day.filter(datetime__gte=start, datetime__lte=stop)
-		result = Candlestick.media_movel_exponencial(20, qs)
-		self.assertEqual(round(result[stop], 3), 80.977)
+		return start, stop
+
+	def test_media_movel_exponencial_20(self):
+		start, stop = self.create_candlesticks(100)
+		result = MediaMovelExponencial(20, start, stop + timedelta(days=1)).execute()
+		self.assertEqual(round(result[-1], 3), 80.977)
