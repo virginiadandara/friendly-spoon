@@ -22,4 +22,4 @@ class CandlestickTests(TestCase):
 	def test_media_movel_exponencial_20(self):
 		start, stop = self.create_candlesticks(100)
 		result = MediaMovelExponencial(20, start, stop + timedelta(days=1)).execute()
-		self.assertEqual(round(result[-1], 3), 80.977)
+		self.assertEqual(round(result[-1], 3), 80.976)
