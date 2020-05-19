@@ -51,7 +51,7 @@ class MediaMovelExponencial:
 		self.base_mme = mean(map(lambda c: c.close, self.qs[:self.period]))
 
 	def _get_queryset(self):
-		self.qs = Candlestick.end_of_the_day.filter(datetime__gte=self.start, datetime__lt=self.stop)
+		self.qs = Candlestick.daily.filter(datetime__gte=self.start, datetime__lt=self.stop)
 		self.qs = sorted(self.qs, key=lambda cs: cs.datetime)
 
 	def _calculate(self):
