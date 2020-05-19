@@ -12,9 +12,9 @@ class CandlestickTests(TestCase):
 		candlesticks = []
 		stop = datetime.now()
 		start = stop - timedelta(days=n)
-		candlesticks.append(CandlestickFactory.build(datetime=stop))
+		candlesticks.append(CandlestickFactory.build(datetime=stop, type=Candlestick.DAY))
 		for i in range(1, n):
-			cs = CandlestickFactory.build(datetime=start + timedelta(days=i))
+			cs = CandlestickFactory.build(datetime=start + timedelta(days=i), type=Candlestick.DAY)
 			candlesticks.append(cs)
 		Candlestick.objects.bulk_create(candlesticks)
 		return start, stop
