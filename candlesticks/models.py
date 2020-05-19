@@ -38,6 +38,9 @@ class CandlestickDayManager(models.Manager):
 		return super().get_queryset().filter(type=Candlestick.DAY)
 
 class Candlestick(models.Model):
+	class Meta:
+		unique_together = ('datetime', 'type')
+
 	REGULAR = 0
 	DAY = 1
 	TYPE_CHOICES = (
@@ -45,14 +48,14 @@ class Candlestick(models.Model):
 		(DAY, 'day'),
 	)
 
-	datetime = models.DateTimeField(unique=True, db_index=True)
+	datetime = models.DateTimeField(db_index=True)
 	open = models.FloatField()
 	high = models.FloatField()
 	low = models.FloatField()
 	close = models.FloatField()
-	volume_btc = models.FloatField()
-	volume_currency = models.FloatField()
-	weighted_price = models.FloatField()
+	volume_btc = models.FloatField(null=True)
+	volume_currency = models.FloatField(null=True)
+	weighted_price = models.FloatField(null=True)
 	type = models.IntegerField(choices=TYPE_CHOICES, default=REGULAR)
 
 	objects = CandlestickManager()
