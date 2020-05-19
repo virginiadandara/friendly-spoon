@@ -23,6 +23,20 @@ class CandlestickEndOfTheDayManager(models.Manager):
 			.order_by('-datetime__date', '-datetime').distinct('datetime__date')\
 			.filter(type=Candlestick.REGULAR)
 
+class CandlestickManager(models.Manager):
+	'''
+	Manager que retorna candlesticks não-diários
+	'''
+	def get_queryset(self):
+		return super().get_queryset().filter(type=Candlestick.REGULAR)
+
+class CandlestickDayManager(models.Manager):
+	'''
+	Manager que retorna apenas candlesticks do tipo diário
+	'''
+	def get_queryset(self):
+		return super().get_queryset().filter(type=Candlestick.DAY)
+
 class Candlestick(models.Model):
 	REGULAR = 0
 	DAY = 1
@@ -41,7 +55,8 @@ class Candlestick(models.Model):
 	weighted_price = models.FloatField()
 	type = models.IntegerField(choices=TYPE_CHOICES, default=REGULAR)
 
-	objects = models.Manager()
+	objects = CandlestickManager()
+	daily = CandlestickDayManager()						 # filtro: candlestick representando um dia inteiro
 	end_of_the_day = CandlestickEndOfTheDayManager()	 # filtro: último candlestick de cada dia
 	start_of_the_day = CandlestickStartOfTheDayManager() # filtro: primeiro candlestick de cada dia
 
