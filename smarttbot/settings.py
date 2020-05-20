@@ -25,7 +25,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 key_file = Path('key')
 if not Path('key').exists():
     # gerar uma chave secreta caso nenhuma exista (projeto recém-instalado)
-    breakpoint()
     key_file.touch()
     with open(key_file, 'w') as f:
         f.write(get_random_secret_key())
