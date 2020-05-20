@@ -29,26 +29,26 @@ class Command(BaseCommand):
 
 	@cached_property
 	def open(self):
-		return Candlestick.objects.raw('''
+		return list(Candlestick.objects.raw('''
 			SELECT DISTINCT ON (DATE("datetime")) id, open
 			FROM candlesticks_candlestick
 			WHERE type = 0
 			ORDER BY DATE("datetime"), "datetime" ASC;
-		''')
+		'''))
 
 	@cached_property
 	def close(self):
-		return Candlestick.objects.raw('''
+		return list(Candlestick.objects.raw('''
 			SELECT DISTINCT ON (DATE("datetime")) id, close
 			FROM candlesticks_candlestick
 			WHERE type = 0
 			ORDER BY DATE("datetime"), "datetime" DESC;
-		''')
+		'''))
 
 	@cached_property
 	def high(self):
-		return Candlestick.objects.values('datetime__date').annotate(Max('high')).order_by('datetime__date')
+		return list(Candlestick.objects.values('datetime__date').annotate(Max('high')).order_by('datetime__date'))
 
 	@cached_property
 	def low(self):
-		return Candlestick.objects.values('datetime__date').annotate(Min('low')).order_by('datetime__date')
+		return list(Candlestick.objects.values('datetime__date').annotate(Min('low')).order_by('datetime__date'))
