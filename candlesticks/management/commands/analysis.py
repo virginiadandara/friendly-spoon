@@ -7,10 +7,17 @@ from candlesticks.services import MediaMovelExponencial, IndiceForcaRelativa
 
 
 class Command(BaseCommand):
+	'''
+	Este comando é simplesmente um wrapper dos serviços descritos em 
+	candlesticks/services.py. Tudo que ele faz é receber informações da linha de
+	comando, agrupar os índices em um dataframe do pandas, e exportá-lo como 
+	CSV.
+	'''
+
 	def add_arguments(self, parser):
-		parser.add_argument('date_start', type=pd.to_datetime)
-		parser.add_argument('date_stop', type=pd.to_datetime)
-		parser.add_argument('output', type=Path)
+		parser.add_argument('date_start', type=pd.to_datetime, help='data de início (inclusive) no formato ISO (YYYY-MM-DD [HH:mm:ss[.ms]]')
+		parser.add_argument('date_stop', type=pd.to_datetime, help='data de término (exclusive) no formato ISO (YYYY-MM-DD [HH:mm:ss[.ms]]')
+		parser.add_argument('output', type=Path, help='caminho para a saída no formato CSV.')
 
 	def handle(self, *args, **options):
 		start, stop = options['date_start'], options['date_stop']

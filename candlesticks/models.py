@@ -16,7 +16,16 @@ class CandlestickDayManager(models.Manager):
 		return super().get_queryset().filter(type=Candlestick.DAY)
 
 class Candlestick(models.Model):
+	'''
+	Modelo básico da aplicação. É a única tabela criada para lidar com os dados,
+	e é obrigatório preencher os dados de open, high, low e close - caso contrário,
+	é um candlestick incompleto e inválido. Os campos volume_btc, volume_currency 
+	e weighted_price foram criados para acomodar os dados da planilha original, 
+	mas no fim das contas não foram utilizados para esse projeto.
+	'''
+
 	class Meta:
+		# Garantindo que não haverá dados contraditórios relativos ao mesmo intervalo de tempo
 		unique_together = ('datetime', 'type')
 
 	REGULAR = 0
@@ -36,8 +45,8 @@ class Candlestick(models.Model):
 	weighted_price = models.FloatField(null=True)
 	type = models.IntegerField(choices=TYPE_CHOICES, default=REGULAR)
 
-	objects = CandlestickManager()
-	daily = CandlestickDayManager()						 # filtro: candlestick representando um dia inteiro
+	objects = CandlestickManager()		# filtro: candlesticks padrão inseridos (representam intervalos de tempo arbitrários)				
+	daily = CandlestickDayManager()		# filtro: candlestick representando um dia inteiro
 
 	def __repr__(self):
 		return f'<Candlestick {self.datetime}>'

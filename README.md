@@ -30,6 +30,7 @@ As descrições e a documentação de cada função e cada classe são descritas
 Também é importante criar um usuário de mesmo nome do usuário atual e com privilégios de superusuário. Um exemplo de script para configuração inicial em distros arch é:
 
 ```bash
+sudo -iu postgres
 initdb -D /var/lib/postgres/data
 systemctl start postgresql
 systemctl enable postgresql
@@ -74,7 +75,7 @@ O segundo comando é responsável por criar um "candlestick-resumo" que diz o va
 
 ## Extraindo dados de índices
 
-Para obter uma planilha apropriada, execute o comando abaixo, com as datas em formato ISO:
+Para obter uma planilha apropriada, execute o comando abaixo, com as datas em **formato ISO**:
 
 ```bash
 python manage.py analysis "data-inicio" "data-final" arquivo-saida.csv
