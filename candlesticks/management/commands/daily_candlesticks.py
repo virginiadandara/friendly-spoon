@@ -1,7 +1,7 @@
 from functools import cached_property
 
 from django.core.management.base import BaseCommand
-from django.db.models import Max, Min, F
+from django.db.models import Max, Min
 from django.db.transaction import atomic
 
 from candlesticks.models import Candlestick
