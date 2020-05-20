@@ -133,3 +133,6 @@ db/
 
 # Chave secreta não versionada (para colocar em django.conf.settings.SECRET_KEY)
 key
+
+# Arquivos de saída contendo os índices calculados
+*.csv
