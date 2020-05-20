@@ -1,7 +1,9 @@
 from statistics import mean
 from datetime import timedelta
+from functools import cached_property
 
 import pandas as pd
+from django.db.models import F
 
 from candlesticks.models import Candlestick
 
@@ -16,7 +18,7 @@ class MediaMovelExponencial:
 	Retorna um pandas.Series ordenado por data.
 	'''
 
-	def __init__(self, period, start, stop):
+	def __init__(self, start, stop, period=20):
 		'''
 		Parâmetros
 		----------
@@ -34,7 +36,8 @@ class MediaMovelExponencial:
 
 	def execute(self):
 		'''
-		Método principal (público) que ordena as operações realizadas para calcular a MME.
+		Método principal (público) que ordena as operações realizadas para c
+		alcular a MME.
 
 		Retorno
 		----------
@@ -42,17 +45,17 @@ class MediaMovelExponencial:
 		Série com valores da MME para o período solicitado, ordenado pela data.
 		'''
 
-		self._get_queryset()
-		self._get_base_value()
 		self._calculate()
 		return pd.Series(self.result).sort_index()
 
-	def _get_base_value(self):
-		self.base_mme = mean(map(lambda c: c.close, self.qs[:self.period]))
+	@cached_property
+	def base_mme(self):
+		return mean(map(lambda c: c.close, self.qs[:self.period]))
 
-	def _get_queryset(self):
-		self.qs = Candlestick.daily.filter(datetime__gte=self.start, datetime__lt=self.stop)
-		self.qs = sorted(self.qs, key=lambda cs: cs.datetime)
+	@cached_property
+	def qs(self):
+		return Candlestick.daily.filter(datetime__gte=self.start, datetime__lt=self.stop)\
+			.order_by('datetime')
 
 	def _calculate(self):
 		out = {}
@@ -62,3 +65,47 @@ class MediaMovelExponencial:
 			mme += (cs.close - mme) * k
 			out[cs.datetime.date()] = mme
 		self.result = out
+
+
+class IndiceForcaRelativa:
+	def __init__(self, date_start, date_stop, period=14):
+		self.start = pd.to_datetime(date_start)
+		self.stop = pd.to_datetime(date_stop)
+		self.period = period
+		self.limit = period + (self.stop - self.start).days + 1
+
+	def execute(self):
+		out = {}
+		for i in range(len(self.positive) - self.period):
+			curr = self.positive[i] 	# candlestick atual
+			if curr['datetime'] < self.start: break
+			pos_data = [cs['close'] for cs in self.positive[i:i+self.period]]
+			neg_data = [cs['close'] for cs in self.negative[i:i+self.period]]
+			U = mean(pos_data)
+			D = mean(neg_data)
+			out[curr['datetime'].date()] = 100 - 100 / (1 + U / D)
+		return pd.Series(out)
+
+	@cached_property
+	def fields(self):
+		# campos extraídos da tabela candlestick
+		return ['datetime', 'close']
+
+	@cached_property
+	def diff(self):
+		# campo que representa a diferença entre o valor na abertura e o valor no fechamento
+		return F('close') - F('open')
+
+	@cached_property
+	def negative(self):
+		# candlesticks diários que tiveram queda de preço
+		return Candlestick.daily.values(*self.fields, diff=self.diff)\
+			.filter(diff__lt=0, datetime__lt=self.stop)\
+			.order_by('-datetime')[:self.limit]
+
+	@cached_property
+	def positive(self):
+		# candlesticks diários que tiveram aumento de preço
+		return Candlestick.daily.values(*self.fields, diff=self.diff)\
+			.filter(diff__gt=0, datetime__lt=self.stop)\
+			.order_by('-datetime')[:self.limit]
