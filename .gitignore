@@ -128,5 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Pasta para armazenar a planilha do kaggle e o PDF com as instruções
 db/
+
+# Chave secreta não versionada (para colocar em django.conf.settings.SECRET_KEY)
 key
+
+# Arquivos de saída contendo os índices calculados
+*.csv
