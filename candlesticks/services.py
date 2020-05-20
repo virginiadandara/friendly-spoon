@@ -1,4 +1,4 @@
-from statistics import mean
+from statistics import mean, StatisticsError
 from datetime import timedelta
 from functools import cached_property
 
@@ -81,8 +81,11 @@ class IndiceForcaRelativa:
 			if current_candlestick['datetime'] < self.start: break
 			pos_data = [cs['close'] for cs in self.positive if cs['datetime'] < current_candlestick['datetime']][:self.period]
 			neg_data = [cs['close'] for cs in self.negative if cs['datetime'] < current_candlestick['datetime']][:self.period]
-			U = mean(pos_data)
-			D = mean(neg_data)
+			try:
+				U = mean(pos_data)
+				D = mean(neg_data)
+			except StatisticsError:
+				continue
 			out[current_candlestick['datetime'].date()] = 100 - 100 / (1 + U / D)
 		return pd.Series(out)
 
