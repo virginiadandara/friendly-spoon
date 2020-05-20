@@ -76,14 +76,14 @@ class IndiceForcaRelativa:
 
 	def execute(self):
 		out = {}
-		for i in range(len(self.positive) - self.period):
-			curr = self.positive[i] 	# candlestick atual
-			if curr['datetime'] < self.start: break
-			pos_data = [cs['close'] for cs in self.positive[i:i+self.period]]
-			neg_data = [cs['close'] for cs in self.negative[i:i+self.period]]
+		all_ = sorted(self.positive + self.negative, key=lambda cs: cs['datetime'], reverse=True)
+		for current_candlestick in all_:
+			if current_candlestick['datetime'] < self.start: break
+			pos_data = [cs['close'] for cs in self.positive if cs['datetime'] < current_candlestick['datetime']][:self.period]
+			neg_data = [cs['close'] for cs in self.negative if cs['datetime'] < current_candlestick['datetime']][:self.period]
 			U = mean(pos_data)
 			D = mean(neg_data)
-			out[curr['datetime'].date()] = 100 - 100 / (1 + U / D)
+			out[current_candlestick['datetime'].date()] = 100 - 100 / (1 + U / D)
 		return pd.Series(out)
 
 	@cached_property
@@ -99,13 +99,13 @@ class IndiceForcaRelativa:
 	@cached_property
 	def negative(self):
 		# candlesticks diários que tiveram queda de preço
-		return Candlestick.daily.values(*self.fields, diff=self.diff)\
+		return list(Candlestick.daily.values(*self.fields, diff=self.diff)\
 			.filter(diff__lt=0, datetime__lt=self.stop)\
-			.order_by('-datetime')[:self.limit]
+			.order_by('-datetime')[:self.limit])
 
 	@cached_property
 	def positive(self):
 		# candlesticks diários que tiveram aumento de preço
-		return Candlestick.daily.values(*self.fields, diff=self.diff)\
+		return list(Candlestick.daily.values(*self.fields, diff=self.diff)\
 			.filter(diff__gt=0, datetime__lt=self.stop)\
-			.order_by('-datetime')[:self.limit]
+			.order_by('-datetime')[:self.limit])
